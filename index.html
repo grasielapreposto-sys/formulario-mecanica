@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Solicitação de Serviço Mecânico</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  :root {
+    --azul: #1A3C5E;
+    --azul-med: #2563A8;
+    --azul-claro: #EBF2FB;
+    --azul-borda: #A8C4E0;
+    --cinza: #6B7280;
+    --cinza-borda: #D1D5DB;
+    --cinza-fundo: #F9FAFB;
+    --texto: #111827;
+    --danger: #DC2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'IBM Plex Sans', sans-serif; background: #EEF1F5; min-height: 100vh; padding: 0 0 40px; color: var(--texto); }
+  .header { background: var(--azul); padding: 24px 20px 20px; color: white; }
+  .header-inner { max-width: 560px; margin: 0 auto; }
+  .header-badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; }
+  .header h1 { font-size: 20px; font-weight: 600; line-height: 1.3; }
+  .header p { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px; }
+  .container { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+  .section { margin-top: 20px; }
+  .section-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--azul-med); margin-bottom: 8px; padding-left: 2px; }
+  .card { background: white; border-radius: 12px; border: 1px solid var(--cinza-borda); overflow: hidden; }
+  .field { padding: 14px 16px 12px; border-bottom: 1px solid #F3F4F6; }
+  .field:last-child { border-bottom: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .field-row .field { border-right: 1px solid #F3F4F6; }
+  .field-row .field:last-child { border-right: none; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .field-row-3 .field { border-right: 1px solid #F3F4F6; }
+  .field-row-3 .field:last-child { border-right: none; }
+  label { display: block; font-size: 11px; font-weight: 500; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .required-dot { display: inline-block; width: 5px; height: 5px; background: var(--danger); border-radius: 50%; margin-left: 4px; vertical-align: middle; position: relative; top: -1px; }
+  input[type="text"], input[type="number"], input[type="date"], select, textarea { width: 100%; border: none; outline: none; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; color: var(--texto); background: transparent; padding: 0; }
+  input[type="text"]::placeholder, input[type="number"]::placeholder, textarea::placeholder { color: #C4C9D4; }
+  input[type="number"] { -moz-appearance: textfield; }
+  input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+  select { appearance: none; cursor: pointer; }
+  textarea { resize: none; height: 80px; line-height: 1.5; }
+  .car-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 16px; }
+  .car-option { position: relative; }
+  .car-option input[type="radio"] { display: none; }
+  .car-option label { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 14px 8px 10px; border: 1.5px solid var(--cinza-borda); border-radius: 10px; cursor: pointer; transition: all 0.15s; text-align: center; text-transform: none; letter-spacing: 0; font-size: 14px; color: var(--texto); }
+  .car-option input:checked + label { border-color: var(--azul-med); background: var(--azul-claro); color: var(--azul); }
+  .car-icon { font-size: 26px; line-height: 1; }
+  .car-name { font-size: 13px; font-weight: 600; }
+  .car-brand { font-size: 10px; color: var(--cinza); }
+  .car-option input:checked + label .car-brand { color: var(--azul-med); }
+  .car-check { display: none; position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; background: var(--azul-med); border-radius: 50%; align-items: center; justify-content: center; }
+  .car-check::after { content: ''; width: 5px; height: 3px; border-left: 1.5px solid white; border-bottom: 1.5px solid white; transform: rotate(-45deg) translateY(-1px); display: block; }
+  .car-option input:checked ~ .car-check { display: flex; }
+  .servico-list { padding: 4px 16px 8px; }
+  .servico-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; cursor: pointer; }
+  .servico-item:last-child { border-bottom: none; }
+  .servico-item input[type="checkbox"] { display: none; }
+  .check-box { width: 20px; height: 20px; border: 1.5px solid var(--cinza-borda); border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.12s; background: white; }
+  .servico-item input:checked ~ .check-box { background: var(--azul-med); border-color: var(--azul-med); }
+  .servico-item input:checked ~ .check-box::after { content: ''; width: 6px; height: 4px; border-left: 2px solid white; border-bottom: 2px solid white; transform: rotate(-45deg) translateY(-1px); display: block; }
+  .servico-label { font-size: 14px; color: var(--texto); line-height: 1.4; }
+  .urgencia-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px 14px; }
+  .urg-option input[type="radio"] { display: none; }
+  .urg-option label { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 6px; border: 1.5px solid var(--cinza-borda); border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--cinza); text-transform: none; letter-spacing: 0; transition: all 0.12s; }
+  .urg-option input:checked + label.baixa { border-color: #16A34A; background: #F0FDF4; color: #166534; }
+  .urg-option input:checked + label.media { border-color: #D97706; background: #FFFBEB; color: #92400E; }
+  .urg-option input:checked + label.alta  { border-color: #DC2626; background: #FEF2F2; color: #991B1B; }
+  .declaracao-box { display: flex; gap: 12px; align-items: flex-start; padding: 16px; background: var(--azul-claro); border-radius: 10px; border: 1px solid var(--azul-borda); cursor: pointer; }
+  .declaracao-box input[type="checkbox"] { display: none; }
+  .decl-check { width: 22px; height: 22px; border: 1.5px solid var(--azul-borda); border-radius: 6px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; background: white; transition: all 0.12s; }
+  #declaracao:checked ~ .decl-check { background: var(--azul); border-color: var(--azul); }
+  #declaracao:checked ~ .decl-check::after { content: ''; width: 7px; height: 4px; border-left: 2px solid white; border-bottom: 2px solid white; transform: rotate(-45deg) translateY(-1px); display: block; }
+  .decl-text { font-size: 13px; color: #374151; line-height: 1.55; }
+  .btn-enviar { display: block; width: 100%; margin-top: 20px; padding: 15px; background: var(--azul); color: white; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; letter-spacing: 0.02em; transition: background 0.15s, transform 0.1s; }
+  .btn-enviar:hover { background: #122d47; }
+  .btn-enviar:active { transform: scale(0.98); }
+  .btn-enviar:disabled { background: #9CA3AF; cursor: not-allowed; transform: none; }
+  #tela-sucesso { display: none; margin-top: 20px; }
+  .sucesso-card { background: white; border-radius: 12px; border: 1px solid var(--azul-borda); padding: 28px 20px; text-align: center; }
+  .sucesso-icon { width: 56px; height: 56px; background: var(--azul-claro); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 26px; }
+  .sucesso-titulo { font-size: 17px; font-weight: 600; color: var(--azul); margin-bottom: 8px; }
+  .sucesso-sub { font-size: 13px; color: var(--cinza); margin-bottom: 20px; }
+  .btn-pdf { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 14px; background: var(--azul); color: white; font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; transition: background 0.15s; }
+  .btn-pdf:hover { background: #122d47; }
+  .btn-whats { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; padding: 13px; background: #16A34A; color: white; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; }
+  .btn-nova { display: block; width: 100%; margin-top: 10px; padding: 12px; background: transparent; color: var(--cinza); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; border: 1px solid var(--cinza-borda); border-radius: 10px; cursor: pointer; }
+  .loading { display: none; text-align: center; padding: 20px; color: var(--azul); font-size: 14px; }
+  @media (max-width: 400px) {
+    .car-name { font-size: 12px; }
+    .car-icon { font-size: 22px; }
+    .field-row, .field-row-3 { grid-template-columns: 1fr; }
+    .field-row .field, .field-row-3 .field { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">Saúde Indígena</div>
+    <h1>Solicitação de Serviço Mecânico</h1>
+    <p>Manutenção de veículos — preencha todos os campos obrigatórios</p>
+  </div>
+</div>
+
+<div class="container">
+  <form id="form-mecanica" onsubmit="enviarFormulario(event)" novalidate>
+
+    <div class="section">
+      <div class="section-title">Localização</div>
+      <div class="card">
+        <div class="field-row">
+          <div class="field">
+            <label>Polo de saúde <span class="required-dot"></span></label>
+            <input type="text" id="polo" placeholder="Nome do polo" required autocomplete="off"/>
+          </div>
+          <div class="field">
+            <label>Aldeia <span class="required-dot"></span></label>
+            <input type="text" id="aldeia" placeholder="Nome da aldeia" required autocomplete="off"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Responsável</div>
+      <div class="card">
+        <div class="field">
+          <label>Nome do motorista <span class="required-dot"></span></label>
+          <input type="text" id="motorista" placeholder="Nome completo" required autocomplete="off"/>
+        </div>
+        <div class="field">
+          <label>Enfermeira <span class="required-dot"></span></label>
+          <input type="text" id="prestador" placeholder="Nome completo" required autocomplete="off"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Veículo</div>
+      <div class="card">
+        <div style="padding: 14px 16px 4px;">
+          <label>Modelo do veículo <span class="required-dot"></span></label>
+        </div>
+        <div class="car-grid">
+          <div class="car-option">
+            <input type="radio" name="modelo" id="titano" value="Titano (Nissan Frontier)" required/>
+            <label for="titano"><span class="car-icon">🛻</span><span class="car-name">Titano</span><span class="car-brand">Nissan Frontier</span></label>
+            <div class="car-check"></div>
+          </div>
+          <div class="car-option">
+            <input type="radio" name="modelo" id="ranger" value="Ranger (Ford)"/>
+            <label for="ranger"><span class="car-icon">🛻</span><span class="car-name">Ranger</span><span class="car-brand">Ford</span></label>
+            <div class="car-check"></div>
+          </div>
+          <div class="car-option">
+            <input type="radio" name="modelo" id="s10" value="S10 (Chevrolet)"/>
+            <label for="s10"><span class="car-icon">🛻</span><span class="car-name">S10</span><span class="car-brand">Chevrolet</span></label>
+            <div class="car-check"></div>
+          </div>
+        </div>
+        <div class="field-row-3" style="border-top: 1px solid #F3F4F6;">
+          <div class="field">
+            <label>Placa <span class="required-dot"></span></label>
+            <input type="text" id="placa" placeholder="ABC-1234" maxlength="8" required autocomplete="off" oninput="this.value=this.value.toUpperCase()"/>
+          </div>
+          <div class="field">
+            <label>Quilometragem <span class="required-dot"></span></label>
+            <input type="number" id="km" placeholder="Ex: 45000" required min="0"/>
+          </div>
+          <div class="field">
+            <label>Data <span class="required-dot"></span></label>
+            <input type="date" id="data" required/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Defeito / Problema relatado</div>
+      <div class="card">
+        <div class="field">
+          <label>Descrição do defeito <span class="required-dot"></span></label>
+          <textarea id="defeito" placeholder="Descreva o problema, sintoma ou defeito observado no veículo..." required></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Serviços solicitados <span class="required-dot"></span></div>
+      <div class="card">
+        <div class="servico-list">
+          <label class="servico-item" for="s1"><input type="checkbox" id="s1" value="Troca de óleo e filtro"/><div class="check-box"></div><span class="servico-label">Troca de óleo e filtro</span></label>
+          <label class="servico-item" for="s2"><input type="checkbox" id="s2" value="Revisão de freios"/><div class="check-box"></div><span class="servico-label">Revisão de freios</span></label>
+          <label class="servico-item" for="s3"><input type="checkbox" id="s3" value="Suspensão e direção"/><div class="check-box"></div><span class="servico-label">Suspensão e direção</span></label>
+          <label class="servico-item" for="s4"><input type="checkbox" id="s4" value="Sistema elétrico"/><div class="check-box"></div><span class="servico-label">Sistema elétrico</span></label>
+          <label class="servico-item" for="s5"><input type="checkbox" id="s5" value="Troca de pneus / rodas"/><div class="check-box"></div><span class="servico-label">Troca de pneus / rodas</span></label>
+          <label class="servico-item" for="s6"><input type="checkbox" id="s6" value="Motor / correia dentada"/><div class="check-box"></div><span class="servico-label">Motor / correia dentada</span></label>
+          <label class="servico-item" for="s7"><input type="checkbox" id="s7" value="Sistema de arrefecimento"/><div class="check-box"></div><span class="servico-label">Sistema de arrefecimento</span></label>
+          <label class="servico-item" for="s8"><input type="checkbox" id="s8" value="Revisão geral"/><div class="check-box"></div><span class="servico-label">Revisão geral</span></label>
+          <label class="servico-item" for="s9"><input type="checkbox" id="s9" value="Outro"/><div class="check-box"></div><span class="servico-label">Outro</span></label>
+        </div>
+        <div style="padding: 4px 16px 14px; border-top: 1px solid #F3F4F6;">
+          <label style="margin-top:10px;">Observações adicionais</label>
+          <textarea id="obs" placeholder="Informações complementares, peças necessárias, urgências..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Nível de urgência</div>
+      <div class="card">
+        <div class="urgencia-grid">
+          <div class="urg-option"><input type="radio" name="urgencia" id="urg-baixa" value="Baixa"/><label for="urg-baixa" class="baixa">🟢 Baixa</label></div>
+          <div class="urg-option"><input type="radio" name="urgencia" id="urg-media" value="Média"/><label for="urg-media" class="media">🟡 Média</label></div>
+          <div class="urg-option"><input type="radio" name="urgencia" id="urg-alta" value="Alta"/><label for="urg-alta" class="alta">🔴 Alta</label></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Declaração do motorista</div>
+      <label class="declaracao-box" for="declaracao">
+        <input type="checkbox" id="declaracao" onchange="toggleBtn()"/>
+        <div class="decl-check"></div>
+        <span class="decl-text">Declaro que as informações acima são verdadeiras e que o veículo indicado necessita do serviço mecânico descrito, conforme as normas da unidade de saúde indígena.</span>
+      </label>
+    </div>
+
+    <button type="submit" class="btn-enviar" id="btn-enviar" disabled>Enviar solicitação</button>
+    <div class="loading" id="loading">⏳ Gerando PDF e enviando...</div>
+
+  </form>
+
+  <div id="tela-sucesso">
+    <div class="sucesso-card">
+      <div class="sucesso-icon">✅</div>
+      <div class="sucesso-titulo">Solicitação enviada!</div>
+      <div class="sucesso-sub">O PDF foi gerado. Compartilhe pelo WhatsApp ou E-mail com a central.</div>
+      <button class="btn-pdf" onclick="baixarPDF()">📄 Baixar / Compartilhar PDF</button>
+      <button class="btn-whats" onclick="enviarWhats()">💬 Enviar por WhatsApp</button>
+      <button class="btn-nova" onclick="novasolicitacao()">Nova solicitação</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+var dadosSalvos = {};
+var pdfBlob = null;
+
+function toggleBtn() {
+  document.getElementById('btn-enviar').disabled = !document.getElementById('declaracao').checked;
+}
+
+function getServicos() {
+  var ids = ['s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+  var sel = [];
+  ids.forEach(function(id){ var el = document.getElementById(id); if(el && el.checked) sel.push(el.value); });
+  return sel.length ? sel : null;
+}
+
+function getModelo() {
+  var el = document.querySelector('input[name="modelo"]:checked');
+  return el ? el.value : null;
+}
+
+function getUrgencia() {
+  var el = document.querySelector('input[name="urgencia"]:checked');
+  return el ? el.value : 'Não informada';
+}
+
+function formatData(val) {
+  if(!val) return '';
+  var p = val.split('-');
+  return p[2]+'/'+p[1]+'/'+p[0];
+}
+
+function formatKm(val) {
+  if(!val) return '';
+  return parseInt(val).toLocaleString('pt-BR') + ' km';
+}
+
+function gerarPDF(d) {
+  var { jsPDF } = window.jspdf;
+  var doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  var W = 210; var margin = 20; var y = 0;
+
+  // Cabeçalho azul
+  doc.setFillColor(26, 60, 94);
+  doc.rect(0, 0, W, 38, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('SAÚDE INDÍGENA', margin, 13);
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text('Solicitação de Serviço Mecânico', margin, 23);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','normal');
+  doc.text('Manutenção de veículos — gerado automaticamente', margin, 31);
+
+  // Número e data no cabeçalho
+  var agora = new Date();
+  var numSol = 'SOL-' + agora.getFullYear() + String(agora.getMonth()+1).padStart(2,'0') + String(agora.getDate()).padStart(2,'0') + '-' + String(agora.getHours()).padStart(2,'0') + String(agora.getMinutes()).padStart(2,'0');
+  doc.setFontSize(8);
+  doc.text(numSol, W - margin, 13, {align:'right'});
+  doc.text('Emitido: ' + agora.toLocaleString('pt-BR'), W - margin, 20, {align:'right'});
+
+  y = 48;
+
+  function secao(titulo) {
+    doc.setFillColor(235, 242, 251);
+    doc.rect(margin, y, W - margin*2, 7, 'F');
+    doc.setTextColor(37, 99, 168);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','bold');
+    doc.text(titulo.toUpperCase(), margin + 3, y + 5);
+    y += 11;
+  }
+
+  function linha(label, valor, col) {
+    doc.setTextColor(107,114,128);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    var x = col === 2 ? (W/2 + 2) : margin;
+    doc.text(label, x, y);
+    doc.setTextColor(17,24,39);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','bold');
+    doc.text(valor || '—', x, y + 6);
+  }
+
+  function duasColunas(l1, v1, l2, v2) {
+    linha(l1, v1, 1);
+    linha(l2, v2, 2);
+    y += 14;
+    doc.setDrawColor(220,220,220);
+    doc.line(margin, y - 2, W - margin, y - 2);
+  }
+
+  function umaColuna(l1, v1) {
+    linha(l1, v1, 1);
+    y += 14;
+    doc.setDrawColor(220,220,220);
+    doc.line(margin, y - 2, W - margin, y - 2);
+  }
+
+  // LOCALIZAÇÃO
+  secao('Localização');
+  duasColunas('Polo de saúde', d.polo, 'Aldeia', d.aldeia);
+
+  // RESPONSÁVEL
+  secao('Responsável');
+  duasColunas('Nome do motorista', d.motorista, 'Enfermeira', d.prestador);
+
+  // VEÍCULO
+  secao('Veículo');
+  duasColunas('Modelo', d.modelo, 'Placa', d.placa);
+  duasColunas('Quilometragem', formatKm(d.km), 'Data da solicitação', formatData(d.data));
+
+  // DEFEITO
+  secao('Defeito / Problema relatado');
+  doc.setTextColor(107,114,128);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  doc.text('Descrição do defeito', margin, y);
+  y += 6;
+  doc.setTextColor(17,24,39);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  var linhasDefeito = doc.splitTextToSize(d.defeito, W - margin*2);
+  doc.text(linhasDefeito, margin, y);
+  y += linhasDefeito.length * 5 + 8;
+  doc.setDrawColor(220,220,220);
+  doc.line(margin, y - 2, W - margin, y - 2);
+
+  // SERVIÇOS
+  secao('Serviços solicitados');
+  doc.setTextColor(17,24,39);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  var servArr = d.servicos;
+  var col1 = servArr.slice(0, Math.ceil(servArr.length/2));
+  var col2 = servArr.slice(Math.ceil(servArr.length/2));
+  var maxRows = Math.max(col1.length, col2.length);
+  for(var i=0; i<maxRows; i++) {
+    if(col1[i]) { doc.setTextColor(37,99,168); doc.text('✓', margin, y); doc.setTextColor(17,24,39); doc.text(col1[i], margin+6, y); }
+    if(col2[i]) { doc.setTextColor(37,99,168); doc.text('✓', W/2+2, y); doc.setTextColor(17,24,39); doc.text(col2[i], W/2+8, y); }
+    y += 7;
+  }
+  y += 4;
+  doc.setDrawColor(220,220,220);
+  doc.line(margin, y - 2, W - margin, y - 2);
+
+  if(d.obs) {
+    doc.setTextColor(107,114,128); doc.setFontSize(8); doc.text('Observações', margin, y);
+    y += 6;
+    doc.setTextColor(17,24,39); doc.setFontSize(10);
+    var linhasObs = doc.splitTextToSize(d.obs, W - margin*2);
+    doc.text(linhasObs, margin, y);
+    y += linhasObs.length * 5 + 8;
+  }
+
+  // URGÊNCIA
+  secao('Nível de urgência');
+  var urgCor = d.urgencia === 'Alta' ? [220,38,38] : d.urgencia === 'Média' ? [217,119,6] : [22,163,74];
+  doc.setFillColor(...urgCor);
+  doc.roundedRect(margin, y, 40, 10, 3, 3, 'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','bold');
+  doc.text(d.urgencia, margin + 20, y + 7, {align:'center'});
+  y += 18;
+
+  // DECLARAÇÃO
+  doc.setFillColor(235,242,251);
+  doc.rect(margin, y, W-margin*2, 16, 'F');
+  doc.setTextColor(26,60,94);
+  doc.setFontSize(8);
+  doc.setFont('helvetica','normal');
+  var declTexto = doc.splitTextToSize('✓  Declaro que as informações acima são verdadeiras e que o veículo indicado necessita do serviço mecânico descrito, conforme as normas da unidade de saúde indígena.', W-margin*2-6);
+  doc.text(declTexto, margin+3, y+6);
+  y += 22;
+
+  // Rodapé
+  doc.setDrawColor(26,60,94);
+  doc.line(margin, y, W-margin, y);
+  y += 5;
+  doc.setTextColor(107,114,128);
+  doc.setFontSize(8);
+  doc.text('Documento gerado automaticamente pelo sistema de solicitação de serviço mecânico — Saúde Indígena', W/2, y, {align:'center'});
+  doc.text('Para aprovação envie para: grasielapreposto@gmail.com', W/2, y+5, {align:'center'});
+
+  return doc;
+}
+
+function enviarFormulario(e) {
+  e.preventDefault();
+  var polo = document.getElementById('polo').value.trim();
+  var aldeia = document.getElementById('aldeia').value.trim();
+  var motorista = document.getElementById('motorista').value.trim();
+  var prestador = document.getElementById('prestador').value.trim();
+  var modelo = getModelo();
+  var placa = document.getElementById('placa').value.trim();
+  var km = document.getElementById('km').value.trim();
+  var data = document.getElementById('data').value;
+  var defeito = document.getElementById('defeito').value.trim();
+  var servicos = getServicos();
+  var obs = document.getElementById('obs').value.trim();
+  var urgencia = getUrgencia();
+
+  if(!polo||!aldeia||!motorista||!prestador||!modelo||!placa||!km||!data||!defeito) {
+    alert('Por favor, preencha todos os campos obrigatórios.');
+    return;
+  }
+  if(!servicos) { alert('Selecione ao menos um serviço solicitado.'); return; }
+
+  dadosSalvos = { polo, aldeia, motorista, prestador, modelo, placa, km, data, defeito, servicos, obs, urgencia };
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('btn-enviar').disabled = true;
+
+  setTimeout(function() {
+    var doc = gerarPDF(dadosSalvos);
+    pdfBlob = doc.output('blob');
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('form-mecanica').style.display = 'none';
+    document.getElementById('tela-sucesso').style.display = 'block';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }, 500);
+}
+
+function baixarPDF() {
+  var doc = gerarPDF(dadosSalvos);
+  var nome = 'Solicitacao_Mecanica_' + dadosSalvos.placa + '_' + formatData(dadosSalvos.data).replace(/\//g,'-') + '.pdf';
+  doc.save(nome);
+}
+
+function enviarWhats() {
+  var d = dadosSalvos;
+  var texto = '🔧 *SOLICITAÇÃO DE SERVIÇO MECÂNICO*\n\n' +
+    '📍 *Polo:* ' + d.polo + '\n' +
+    '🏘️ *Aldeia:* ' + d.aldeia + '\n' +
+    '👤 *Motorista:* ' + d.motorista + '\n' +
+    '👩‍⚕️ *Enfermeira:* ' + d.prestador + '\n' +
+    '🚗 *Veículo:* ' + d.modelo + '\n' +
+    '🔡 *Placa:* ' + d.placa + '\n' +
+    '📏 *KM:* ' + formatKm(d.km) + '\n' +
+    '📅 *Data:* ' + formatData(d.data) + '\n\n' +
+    '🔩 *Defeito:* ' + d.defeito + '\n\n' +
+    '🛠️ *Serviços:* ' + d.servicos.join(', ') + '\n' +
+    '⚠️ *Urgência:* ' + d.urgencia + '\n\n' +
+    '_Baixe o PDF completo pelo link do formulário._';
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+}
+
+function novasolicitacao() {
+  document.getElementById('form-mecanica').reset();
+  document.getElementById('btn-enviar').disabled = true;
+  document.getElementById('form-mecanica').style.display = 'block';
+  document.getElementById('tela-sucesso').style.display = 'none';
+  pdfBlob = null;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
